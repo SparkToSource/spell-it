@@ -330,8 +330,7 @@ export class UI extends EventTarget {
 
   updateQuestion() {
     this.answer.value = "";
-    this.answer.readOnly = false;
-    this.answer.classList.remove("correct", "wrong");
+    this.answer.classList.remove("correct", "wrong", "readonly");
     this.answer.focus();
 
     this.correctAnswerText.innerText = "";
@@ -345,11 +344,14 @@ export class UI extends EventTarget {
       this.dispatchAnswer();
     };
 
-    this.answer.onkeypress = (e) => {
+    this.answer.onkeydown = (e) => {
       if (e.key === 'Enter' || e.keyCode === 13) {
+        e.preventDefault();
         this.dispatchAnswer();
       }
     }
+
+    this.answer.onpaste = (e) => e.preventDefault();
 
     if (this.questions.currentQuestion.word) {
       this.sayWordBtn.classList.remove("hidden");
@@ -428,9 +430,11 @@ export class UI extends EventTarget {
     this.enterBtn.classList.add("hidden");
     this.nextBtn.classList.remove("hidden");
 
-    this.answer.readOnly = true;
+    this.answer.classList.add("readonly");
 
-    this.answer.onkeypress = (e) => {
+    this.answer.onkeydown = (e) => {
+      e.preventDefault();
+
       if (e.key === 'Enter' || e.keyCode === 13) {
         this.dispatchNext();
       }

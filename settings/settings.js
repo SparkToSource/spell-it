@@ -26,7 +26,7 @@ export class Settings {
   }
 
   getDefaultSettings() {
-    const voice = this.getDefaultVoice();
+    const { voice, rate } = this.getDefaultVoice();
 
     return {
       questions: {
@@ -38,7 +38,7 @@ export class Settings {
       },
       voice: {
         voice,
-        rate: 1,
+        rate,
         pitch: 1,
         volume: 1,
         autoSayWord: true,
@@ -52,14 +52,14 @@ export class Settings {
     const browser = navigator.userAgent;
 
     if (/Chrome/.test(browser)) {
-      return "English United States (en_US)";
+      return { voice: "English United States (en_US)", rate: 0.8 };
     }
 
     if (/Edge/.test(browser)) {
-      return "Microsoft Ava Multilingual Online (Natural) - English (United States)";
+      return { voice: "Microsoft Ava Multilingual Online (Natural) - English (United States)", rate: 1 };
     }
 
-    return "";
+    return {voice: "", rate: 1 };
   }
 
   singleDepthMerge(obj1, obj2) {

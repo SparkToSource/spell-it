@@ -24,7 +24,7 @@
       margin-top: 12vh;
     }
 
-    input {
+    textarea {
       background-color: var(--background-color-secondary);
       font-family: var(--font-family);
       font-size: 1rem;
@@ -33,6 +33,8 @@
       border: 1px solid var(--border-color);
       border-radius: var(--border-radius);
       padding: .4rem;
+      resize: none;
+      overflow: hidden;
     }
 
     p {
@@ -55,9 +57,14 @@
       width: 7rem;
     }
 
-    input.correct, input.wrong {
+    .correct, .wrong {
       outline: none;
       border-color: var(--color-highlight);
+    }
+
+    .readonly {
+      pointer-events: none;
+      caret-color: rgba(0,0,0,0);
     }
     
     .fade-out {      
@@ -84,7 +91,7 @@
       <p id="progress"><span id="currentQuestion">1</span> of <span id="totalQuestions"></span></p>
       <p id="timer" class="text-right"><span id="currentTimeLeft"></span> seconds</p>
     </div>
-    <input id="answer" type="search" inputmode="text" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <textarea id="answer" rows="1" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
     <div class="row space-between m-col-reverse">
       <div class="row">
         <button id="sayWordBtn">Word</button>
