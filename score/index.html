@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Boost your spelling skills with this addictive word game!">
+  <title>Spell It - Score</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/assets/base.css">
+  <script src="/settings/theme.js"></script>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+
+    td, th {
+      border: 1px solid var(--border-color-secondary);
+      text-align: left;
+      padding: 8px;
+    }
+
+    tr:hover td {
+      background: var(--background-color-secondary);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h3 class="text-center">You scored <span id="finalScore"></span> points</h3>
+    <table id="answerHistory">
+      <tr>
+        <th>#</th>
+        <th>Word</th>
+        <th>Answer</th>
+        <th>Time</th>
+      </tr>
+    </table>
+    <button role="link" onclick="window.open('/play', '_self')">New Game</button>
+    <button role="link" onclick="window.open('/', '_self')">Back</button>
+  </main>
+  <script>
+    const gameResult = sessionStorage.getItem("gameResult") ?? "{ score: 0, answers: [] }";
+    const { score, answers } = JSON.parse(gameResult);
+    const answerHistoryTable = document.querySelector("#answerHistory");
+    const finalScoreText = document.querySelector("#finalScore");
+  
+    finalScoreText.innerText = score;
+
+    for (const answer of answers) {
+      const row = document.createElement("tr");
+      
+      if (answer.isCorrect) {
+        row.classList.add("correct");
+      } else {
+        row.classList.add("wrong");
+      }
+
+      const questionNrCol = document.createElement("td");
+      questionNrCol.innerText = answer.questionNumber;
+
+      const wordCol = document.createElement("td");
+      const word = document.createElement("span");
+      word.innerText = answer.question.word;
+      word.title = answer.question.definition;
+      wordCol.append(word);
+
+      const answerCol = document.createElement("td");
+      answerCol.innerText = answer.answer;
+
+      const timeCol = document.createElement("td");
+      timeCol.innerText = `${answer.timePassed}s`;
+
+      row.append(questionNrCol, wordCol, answerCol, timeCol);
+
+      answerHistoryTable.append(row);
+    }
+  </script>
+</body>
+</html>

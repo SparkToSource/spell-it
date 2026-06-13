@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Boost your spelling skills with this addictive word game!">
+  <title>Spell It - Play</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/assets/base.css">
+  <script type="module" src="play.js"></script>
+  <script src="/settings/theme.js"></script>
+  <style>
+    @keyframes fade-out {
+      0% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    main {
+      margin-top: 12vh;
+    }
+
+    input {
+      background-color: var(--background-color-secondary);
+      font-family: var(--font-family);
+      font-size: 1rem;
+      color: var(--font-color);
+      caret-color: var(--font-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: .4rem;
+    }
+
+    p {
+      margin: 0;
+      padding: 0;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .space-between {
+      justify-content: space-between;
+    }
+    
+    #score, #timer {
+      width: 7rem;
+    }
+
+    input.correct, input.wrong {
+      outline: none;
+      border-color: var(--color-highlight);
+    }
+    
+    .fade-out {      
+      animation: 2s ease-in fade-out forwards;
+    }
+
+    @media screen and (max-width: 560px) {
+      .m-col-reverse {
+        flex-direction: column-reverse;
+      }
+
+      .row button {
+        width: 100%;
+        min-width: unset;
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="hidden">
+    <div class="row space-between">
+      <p id="score"><span id="currentScore">0</span> points <span id="increment" class="correct"></span></p>
+      <p id="progress"><span id="currentQuestion">1</span> of <span id="totalQuestions"></span></p>
+      <p id="timer" class="text-right"><span id="currentTimeLeft"></span> seconds</p>
+    </div>
+    <input id="answer" type="search" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <div class="row space-between m-col-reverse">
+      <div class="row">
+        <button id="sayWordBtn">Word</button>
+        <button id="saySentenceBtn">Sentence</button>
+        <button id="sayDefinitionBtn">Definition</button>
+      </div>
+      <button id="enterBtn">Enter</button>
+      <button id="nextBtn" class="hidden">Next</button>
+    </div>
+    <p id="correctAnswer"></p>
+    <p id="sentence"></p>
+    <p id="definition"></p>
+  </main>
+</body>
+</html>

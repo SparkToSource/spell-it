@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Boost your spelling skills with this addictive word game!">
+  <title>Spell It</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/assets/base.css">
+  <link rel="manifest" href="/assets/manifest.json" />
+  <script src="/settings/theme.js"></script>
+  <style>
+    @keyframes rotate-hue {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+
+    main {
+      margin-top: 20vh !important;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+      transform: scaleY(1.5) skewY(-8deg) rotateZ(-3deg);
+      color: transparent;
+      width: 300px;
+      height: 6rem;
+      font-size: 4rem;
+      margin-bottom: 2rem;
+    }
+
+    .logo::before {
+      content: attr(data-text);
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      background: linear-gradient(to bottom left, #fee601, #fee601 15%, #fe4201);
+      background-clip: text;
+    }
+
+    .logo::after {
+      content: attr(data-text);
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      z-index: -1;
+      text-shadow:
+        1px 0 0 #813300,
+        0 1px 0 #c14d00,
+        2px 1px 0.35px #813300,
+        1px 2px 0.35px #c14d00,
+        3px 2px 0.35px #813300,
+        2px 3px 0.35px #c14d00,
+        4px 3px 0.35px #813300,
+        3px 4px 0.35px #c14d00,
+        5px 4px 0.35px #813300,
+        4px 5px 0.35px #c14d00,
+        6px 5px 0.35px #813300,
+        5px 6px 0.35px #c14d00,
+        7px 6px 0.35px #813300,
+        6px 7px 0.35px #c14d00;
+    }
+
+    .logo:hover {
+      animation: 2s infinite linear rotate-hue;
+    }
+
+    button {
+      min-width: 300px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1 class="logo" data-text="Spell-It"></h1>
+    <button role="link" onclick="window.open('/play', '_self')">Play</button>
+    <button role="link" onclick="window.open('/settings', '_self')">Settings</button>
+  </main>
+</body>
+</html>

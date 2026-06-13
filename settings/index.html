@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Boost your spelling skills with this addictive word game!">
+  <title>Spell It - Settings</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/assets/base.css">
+  <script type="module" src="settings.js"></script>
+  <script src="theme.js"></script>
+  <style>
+    main {
+      margin-top: 0;
+      width: 450px;
+    }
+
+    fieldset {
+      border: 1px solid var(--font-color);
+      border-radius: var(--border-radius);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      width: 400px;
+    }
+
+    select {
+      max-width: 215px;
+      text-overflow: ellipsis;
+    }
+
+    input[type=number] {
+      width: 3rem;
+    }
+
+    select, input[type=number] {
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      padding: .2rem;
+    }
+
+    .link {
+      color: #4397E0;
+      cursor: pointer;
+    }
+
+    .link:hover {
+      text-decoration: underline;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: .6ch;
+    }
+
+    .delete-icon {
+      cursor: pointer;
+      font-size: .6rem;
+      margin-left: auto;
+    }
+
+    .delete-icon:hover {
+      filter: saturate(3);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h3>Settings</h3>
+    <fieldset>
+      <legend>Appearance</legend>
+      <label>
+        Theme:
+        <select id="theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+    </fieldset>
+    <fieldset>
+      <legend>Speaker</legend>
+      <label>
+        Language:
+        <select id="language">
+          <option>Loading...</option>
+        </select>
+      </label>
+      <label>
+        Voice:
+        <select id="speakerVoice">
+          <option>Loading...</option>
+        </select>
+      </label>
+      <label>
+        Speed:
+        <input type="range" min="0.1" max="3" step="0.1" id="speakerSpeed">
+      </label>
+      <label>
+        Volume:
+        <input type="range"min="0" max="1" step="0.1" id="speakerVolume">
+      </label>
+      <label>
+        Pitch:
+        <input type="range" min="0" max="2" step="0.1" id="speakerPitch">
+      </label>
+      <label>
+        Auto say word:
+        <input type="checkbox" name="say" id="autoSayWord">
+      </label>
+      <label>
+        Auto say sentence:
+        <input type="checkbox" name="say" id="autoSaySentence">
+      </label>
+      <label>
+        Auto say definition:
+        <input type="checkbox" name="say" id="autoSayDefinition">
+      </label>
+    </fieldset>
+    <fieldset>
+      <legend>Game</legend>
+      <label>
+        Number of questions:
+        <input type="number" id="numberOfQuestions">
+      </label>
+      <label>
+        Enable timer:
+        <input type="checkbox" id="enableTimer">
+      </label>
+      <label>
+        Seconds per question:
+        <input type="number" name="secondsPerQuestion" id="secondsPerQuestion">
+      </label>
+    </fieldset>
+    <fieldset>
+      <legend>Words</legend>
+      <span class="row">Currently using <span class="link" id="wordsDownload">words.json</span><span class="hidden delete-icon" id="wordsDelete">❌</span></span>
+      <label>
+        <span class="button">Upload file</span>
+        <input class="hidden" type="file" id="wordsUpload" accept=".json">
+      </label>
+    </fieldset>
+    <button onclick="window.open('/', '_self')">Back</button>
+    <button id="restoreDefaults">Reset to defaults</button>
+  </main>
+  <script type="module">
+    import { Settings } from "./settings.js";
+    import { Words } from "./words.js";
+
+    class AppearanceSettings {
+      constructor(themeRepistory) {
+        this.themeRepistory = themeRepistory;
+
+        this.themeSelect = document.querySelector("#theme");
+      }
+
+      init() {
+        this.initThemeSelect();
+      }
+      
+      initThemeSelect() {
+        this.themeSelect.onchange = (e) => {
+          this.themeRepistory.setTheme(e.target.value);
+        };
+
+        this.themeSelect.value = this.themeRepistory.getTheme();
+      }
+    }
+
+    class SpeakerSettings {
+      constructor(wordsRepository, settingsRepository, settings) {
+        this.wordsRepository = wordsRepository;
+        this.settingsRepository = settingsRepository;
+        this.settings = settings;
+
+        this.languageSelect = document.querySelector("#language");
+        this.speakerVoiceSelect = document.querySelector("#speakerVoice");
+        this.speakerSpeedSlider = document.querySelector("#speakerSpeed");
+        this.speakerVolumeSlider = document.querySelector("#speakerVolume");
+        this.speakerPitchSlider = document.querySelector("#speakerPitch");
+        this.autoSayWord = document.querySelector("#autoSayWord");
+        this.autoSaySentence = document.querySelector("#autoSaySentence");
+        this.autoSayDefinition = document.querySelector("#autoSayDefinition"); 
+
+        this.utteranceText = "the quick brown fox jumps over the lazy dog";
+      }
+
+      init() {
+        if (speechSynthesis.getVoices().length > 0) {
+          this.initLanguages();
+        } else {
+          let voicesLoaded = false;
+
+          speechSynthesis.onvoiceschanged = () => {
+            if (!voicesLoaded) {
+              this.initLanguages();
+              voicesLoaded = true;
+            }
+          }
+        }
+
+        this.initUtteranceText();
+        this.initSpeedSlider();
+        this.initVolumeSlider();
+        this.initPitchSlider();
+        this.initAutoSayWord();
+        this.initAutoSaySentence();
+        this.initAutoSayDefinition();
+      }
+
+      initUtteranceText() {
+        const setUtteranceText = () => {
+          const firstWord = this.wordsRepository.load()[0];
+
+          if (!firstWord) {
+            return;
+          }
+
+          const textParts = [firstWord.word, firstWord.sentence, firstWord.definition].filter(t => !!t);
+
+          if (textParts.length > 0) {
+            const text = textParts.join(", ");
+            this.utteranceText = text;
+          }
+        }
+
+        setUtteranceText();
+        this.wordsRepository.addEventListener(Words.UPDATE_EVENT, () => setUtteranceText());
+      }
+
+      initLanguages() {
+        const voices = speechSynthesis.getVoices();
+        const voice = voices.find(v => v.name === this.settings.voice.voice) ?? voices[0];
+        const languages = new Set(voices.map(v => v.lang));
+
+        this.languageSelect.innerHTML = "";
+
+        for (const lang of Array.from(languages).sort()) {
+          const option = document.createElement("option");
+          option.textContent = lang;
+
+          this.languageSelect.appendChild(option);
+        }
+
+        this.languageSelect.value = voice.lang;
+
+        this.languageSelect.onchange = (e) => {
+          const language = e.target.value;
+          this.initVoiceSelect(language);
+        }
+
+        this.initVoiceSelect(voice.lang);
+      }
+
+      initVoiceSelect(language, speak = false) {
+        const voices = speechSynthesis.getVoices();
+
+        this.speakerVoiceSelect.innerHTML = "";
+
+        for (let i = 0; i < voices.length; i++) {
+          const voice = voices[i];
+
+          if (voice.lang !== language) {
+            continue;
+          }
+
+          const option = document.createElement("option");
+          option.value = voice.name;
+          option.textContent = `${voice.name.replace("Microsoft ", "")} (${voice.lang})`;
+
+          this.speakerVoiceSelect.appendChild(option);
+        }
+
+        this.speakerVoiceSelect.value = this.settings.voice.voice;
+
+        const onVoiceChange = (voice) => {
+          this.settingsRepository.save({ voice: { voice } });
+          this.testSpeech();
+        }
+
+        if (!this.speakerVoiceSelect.value && this.speakerVoiceSelect.options.length > 0) {
+          const firstVoiceForLanguage = this.speakerVoiceSelect.options[0].value;
+          this.speakerVoiceSelect.value = firstVoiceForLanguage;
+          onVoiceChange(firstVoiceForLanguage);
+        }
+
+        this.speakerVoiceSelect.onchange = (e) => {
+          const voice = e.target.value;
+          onVoiceChange(voice);
+        };
+      }
+
+      initSpeedSlider() {
+        this.speakerSpeedSlider.value = this.settings.voice.speed;
+
+        const updateSpeed = (speed) => {
+          this.settingsRepository.save({ voice: { speed } });
+          this.testSpeech();
+        }
+
+        this.speakerSpeedSlider.oninput = (e) => updateSpeed(e.target.value);
+      }
+
+      initVolumeSlider() {
+        this.speakerVolumeSlider.value = this.settings.voice.volume;
+
+        const updateVolume = (volume) => {
+          this.settingsRepository.save({ voice: { volume } });
+          this.testSpeech();
+        }
+
+        this.speakerVolumeSlider.oninput = (e) => updateVolume(e.target.value);
+      }
+
+      initPitchSlider() {
+        this.speakerPitchSlider.value = this.settings.voice.pitch;
+
+        const updatePitch = (pitch) => {
+          this.settingsRepository.save({ voice: { pitch } });
+          this.testSpeech();
+        }
+
+        this.speakerPitchSlider.oninput = (e) => updatePitch(e.target.value);
+      }
+
+      initAutoSayWord() {
+        this.autoSayWord.checked = this.settings.voice.autoSayWord;
+
+        this.autoSayWord.onchange = (e) => {
+          const autoSayWord = e.target.checked;
+          this.settingsRepository.save({ voice: { autoSayWord } });
+        };
+      }
+
+      initAutoSaySentence() {
+        this.autoSaySentence.checked = this.settings.voice.autoSaySentence;
+
+        this.autoSaySentence.onchange = (e) => {
+          const autoSaySentence = e.target.checked;
+          this.settingsRepository.save({ voice: { autoSaySentence } });
+        };
+      }
+
+      initAutoSayDefinition() {
+        this.autoSayDefinition.checked = this.settings.voice.autoSayDefinition;
+
+        this.autoSayDefinition.onchange = (e) => {
+          const autoSayDefinition = e.target.checked;
+          this.settingsRepository.save({ voice: { autoSayDefinition } });
+        };
+      }
+
+      testSpeech() {
+        speechSynthesis.cancel();
+
+        const voiceName = this.speakerVoiceSelect.value;
+        const voice = speechSynthesis.getVoices().find(v => v.name === voiceName);
+
+        const utterance = new SpeechSynthesisUtterance(this.utteranceText);
+        utterance.voice = voice;
+        utterance.lang = voice.lang;
+        utterance.rate = this.speakerSpeedSlider.value ?? 1;
+        utterance.pitch = this.speakerPitchSlider.value ?? 1;
+        utterance.volume = this.speakerVolumeSlider.value ?? 1;
+
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    class GameSettings {
+      constructor(settingsRepository, settings) {
+        this.settingsRepository = settingsRepository;
+        this.settings = settings;
+
+        this.numberOfQuestions = document.querySelector("#numberOfQuestions"); 
+        this.enableTimer = document.querySelector("#enableTimer"); 
+        this.secondsPerQuestion = document.querySelector("#secondsPerQuestion"); 
+      }
+
+      init() {
+        this.initNumberOfQuestions();
+        this.initEnableTimer();
+        this.initSecondsPerQuestion();
+      }
+
+      initNumberOfQuestions() {
+        this.numberOfQuestions.value = this.settings.questions.numberOfQuestions;
+
+        this.numberOfQuestions.onchange = (e) => {
+          const numberOfQuestions = e.target.value;
+          this.settingsRepository.save({ questions: { numberOfQuestions } });
+        }
+      }
+
+      initEnableTimer() {
+        this.enableTimer.checked = this.settings.timer.enabled;
+
+        this.enableTimer.onchange = (e) => {
+          const enabled = e.target.checked;
+          this.settingsRepository.save({ timer: { enabled } });
+        }
+      }
+
+      initSecondsPerQuestion() {
+        this.secondsPerQuestion.value = this.settings.timer.secondsPerQuestion;
+
+        this.secondsPerQuestion.onchange = (e) => {
+          const secondsPerQuestion = e.target.value;
+          this.settingsRepository.save({ timer: { secondsPerQuestion } });
+        }
+      }
+    }
+
+    class WordsSettings {
+      constructor(wordsRepository) {
+        this.wordsRepository = wordsRepository;
+
+        this.wordsDownload = document.querySelector("#wordsDownload");
+        this.wordsDelete = document.querySelector("#wordsDelete");
+        this.wordsUpload = document.querySelector("#wordsUpload");
+      }
+
+      init() {
+        this.initWordsDownload();
+        this.initWordsDelete();
+        this.initWordsUpload();
+      }
+
+      initWordsDownload() {
+        const fileName = this.wordsRepository.getFileName();
+
+        this.wordsDownload.innerText = fileName;
+
+        this.wordsDownload.onclick = (e) => {
+          const blob = this.wordsRepository.asBlob();
+          const url = URL.createObjectURL(blob);
+          const tmp = document.createElement('a');
+          tmp.href = url;
+          tmp.download = fileName;
+          tmp.click();
+          URL.revokeObjectURL(url);
+        }
+      }
+
+      initWordsDelete() {
+        if (this.wordsRepository.hasUserUploadedWords) {
+          this.wordsDelete.classList.remove("hidden");
+        }
+
+        this.wordsDelete.onclick = () => {
+          const hasConfirmed = confirm("Are you sure you want to reset the words file?");
+          
+          if (hasConfirmed) {
+            this.wordsRepository.delete();
+            this.wordsDownload.innerText = this.wordsRepository.getFileName();
+            this.wordsDelete.classList.add("hidden");
+          }
+        };
+      }
+
+      initWordsUpload() {
+        this.wordsUpload.onchange = (e) => {
+          const file = this.wordsUpload.files[0];
+
+          if (!file) {
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.readAsText(file);
+
+          reader.onload = () => {
+            this.wordsRepository.save(file.name, reader.result);
+            this.wordsDownload.innerText = file.name;
+            this.wordsDelete.classList.remove("hidden");
+            confirm("File has been successfully uploaded.");
+          };
+
+          reader.onerror = (e) => {
+            console.error(e);
+            alert("Unable to upload file, check the console for errors.");
+          };
+
+          this.wordsUpload.value = "";
+        };
+      }
+    }
+
+    const wordsRepository = new Words();
+    const themeRepository = new Theme();
+    const settingsRepository = new Settings();
+    const settings = settingsRepository.load();
+
+    const appearance = new AppearanceSettings(themeRepository);
+    appearance.init();
+
+    const speakerSettings = new SpeakerSettings(wordsRepository, settingsRepository, settings);
+    speakerSettings.init();
+
+    const gameSettings = new GameSettings(settingsRepository, settings);
+    gameSettings.init();
+
+    const wordsSettings = new WordsSettings(wordsRepository);
+    wordsSettings.init();
+
+    const restoreDefaultsBtn = document.querySelector("#restoreDefaults");
+    restoreDefaultsBtn.onclick = () => {
+      const hasConfirmed = confirm('Are you sure you want to reset all settings to their default values?');
+
+      if (hasConfirmed) {
+        settingsRepository.delete();
+        themeRepository.delete();
+
+        location.reload();
+      }
+    };
+  </script>
+</body>
+</html>
