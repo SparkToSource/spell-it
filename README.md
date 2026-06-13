@@ -1,4 +1,4 @@
-# Spell It
+# Spell-It
 
 A lightweight, browser-based spelling game, hosted at [https://sparktosource.github.io/spell-it](https://sparktosource.github.io/spell-it), that reads words aloud and help users practice spelling. Add your own word lists and voices to support multiple languages and accents.
 
