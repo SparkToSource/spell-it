@@ -51,12 +51,12 @@ export class Settings {
   getDefaultVoice() {
     const browser = navigator.userAgent;
 
-    if (/Chrome/.test(browser)) {
-      return { voice: "English United States (en_US)", rate: 0.8 };
+    if (/Edg/.test(browser)) {
+      return { voice: "Microsoft Ava Multilingual Online (Natural) - English (United States)", rate: 1 };
     }
 
-    if (/Edge/.test(browser)) {
-      return { voice: "Microsoft Ava Multilingual Online (Natural) - English (United States)", rate: 1 };
+    if (/Chrome/.test(browser)) {
+      return { voice: "English United States", rate: 0.8 };
     }
 
     return {voice: "", rate: 1 };

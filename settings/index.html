@@ -273,7 +273,7 @@
 
           const option = document.createElement("option");
           option.value = voice.name;
-          option.textContent = `${voice.name.replace("Microsoft ", "")} (${voice.lang})`;
+          option.textContent = voice.name.replace("Microsoft ", "");
 
           this.speakerVoiceSelect.appendChild(option);
         }
@@ -298,14 +298,14 @@
       }
 
       initSpeedSlider() {
-        this.speakerSpeedSlider.value = this.settings.voice.speed;
+        this.speakerSpeedSlider.value = this.settings.voice.rate;
 
-        const updateSpeed = (speed) => {
-          this.settingsRepository.save({ voice: { speed } });
+        const updateSpeed = (rate) => {
+          this.settingsRepository.save({ voice: { rate } });
           this.testSpeech();
         }
 
-        this.speakerSpeedSlider.oninput = (e) => updateSpeed(e.target.value);
+        this.speakerSpeedSlider.oninput = (e) => updateSpeed(+e.target.value);
       }
 
       initVolumeSlider() {
