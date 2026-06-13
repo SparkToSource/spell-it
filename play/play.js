@@ -61,7 +61,7 @@ export class Game {
 
     sessionStorage.setItem("gameResult", JSON.stringify(gameResult));
 
-    window.open("/score", "_self");
+    window.open("../score", "_self");
   }
 }
 
