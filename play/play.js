@@ -351,6 +351,7 @@ export class UI extends EventTarget {
       }
     }
 
+    this.answer.onbeforeinput = null;
     this.answer.onpaste = (e) => e.preventDefault();
 
     if (this.questions.currentQuestion.word) {
@@ -431,6 +432,8 @@ export class UI extends EventTarget {
     this.nextBtn.classList.remove("hidden");
 
     this.answer.classList.add("readonly");
+
+    this.answer.onbeforeinput = (e) => e.preventDefault();
 
     this.answer.onkeydown = (e) => {
       e.preventDefault();
