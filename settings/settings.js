@@ -26,6 +26,8 @@ export class Settings {
   }
 
   getDefaultSettings() {
+    const voice = this.getDefaultVoice();
+
     return {
       questions: {
         numberOfQuestions: 15,
@@ -35,7 +37,7 @@ export class Settings {
         secondsPerQuestion: 15,
       },
       voice: {
-        voice: "Microsoft Ava Multilingual Online (Natural) - English (United States)",
+        voice,
         rate: 1,
         pitch: 1,
         volume: 1,
@@ -44,6 +46,20 @@ export class Settings {
         autoSayDefinition: true,
       },
     };
+  }
+
+  getDefaultVoice() {
+    const browser = navigator.userAgent;
+
+    if (/Chrome/.test(browser)) {
+      return "English United States (en_US)";
+    }
+
+    if (/Edge/.test(browser)) {
+      return "Microsoft Ava Multilingual Online (Natural) - English (United States)";
+    }
+
+    return "";
   }
 
   singleDepthMerge(obj1, obj2) {
